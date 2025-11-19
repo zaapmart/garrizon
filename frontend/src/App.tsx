@@ -8,6 +8,7 @@ import { ProductList } from './pages/ProductList';
 import { ProductDetail } from './pages/ProductDetail';
 import { Cart } from './pages/Cart';
 import { Checkout } from './pages/Checkout';
+import { Admin } from './pages/Admin';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
+          <Route path="admin" element={<Admin />} />
         </Route>
       </Route>
     </Routes>
