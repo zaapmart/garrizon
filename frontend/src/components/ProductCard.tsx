@@ -9,16 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { formatPrice } from '../lib/utils';
 import api from '../services/api';
 
-interface Product {
-    id: number;
-    name: string;
-    slug: string;
-    description: string;
-    price: number;
-    imageUrl: string;
-    categoryName: string;
-    stock: number;
-}
+import type { Product } from '../types';
 
 interface ProductCardProps {
     product: Product;
