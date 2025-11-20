@@ -6,9 +6,9 @@ spring:
     active: dev
   
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/garrizon}
-    username: ${DATABASE_USERNAME:garrizon}
-    password: ${DATABASE_PASSWORD:garrizon123}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/mydb}
+    username: ${DATABASE_USERNAME:myuser}
+    password: ${DATABASE_PASSWORD:mypassword}
     driver-class-name: org.postgresql.Driver
   
   jpa:
