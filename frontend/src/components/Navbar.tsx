@@ -34,10 +34,40 @@ export const Navbar = () => {
                                 Home
                             </Link>
                             <Link
+                                to="/products?category=grains"
+                                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                            >
+                                Grains
+                            </Link>
+                            <Link
+                                to="/products?category=tubers"
+                                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                            >
+                                Tubers
+                            </Link>
+                            <Link
+                                to="/products?category=vegetables"
+                                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                            >
+                                Vegetables
+                            </Link>
+                            <Link
+                                to="/products?category=flour"
+                                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                            >
+                                Flour
+                            </Link>
+                            <Link
+                                to="/products?category=fruits"
+                                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                            >
+                                Fruits
+                            </Link>
+                            <Link
                                 to="/products"
                                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                             >
-                                Products
+                                All Products
                             </Link>
                         </div>
                     </div>

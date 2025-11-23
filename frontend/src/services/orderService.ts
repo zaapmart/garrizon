@@ -1,5 +1,5 @@
 import api from './api';
-import { CartItem } from '../store/cartStore';
+import type { CartItem } from '../store/cartStore';
 
 export interface OrderDTO {
     id: number;

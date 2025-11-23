@@ -4,6 +4,7 @@ import com.garrizon.model.Cart;
 import com.garrizon.repository.CartRepository;
 import com.garrizon.service.EmailService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,8 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Component
+// @Component - Disabled for development (depends on EmailService)
 @RequiredArgsConstructor
+@Slf4j
 public class AbandonedCartScheduler {
 
     private final CartRepository cartRepository;
@@ -29,7 +31,7 @@ public class AbandonedCartScheduler {
         for (Cart cart : abandonedCarts) {
             if (cart.getUser() != null) {
                 emailService.sendAbandonedCartEmail(cart.getUser().getEmail(), cart.getUser().getFirstName());
-                
+
                 cart.setLastEmailSentAt(LocalDateTime.now());
                 cartRepository.save(cart);
             }

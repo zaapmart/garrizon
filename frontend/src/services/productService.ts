@@ -20,7 +20,7 @@ export const productService = {
         // If the backend only has getById, we might need to adjust.
         // Let's assume we use getById for now in the UI if slug isn't supported directly yet.
         // Or better, let's add a TODO to check backend support.
-        const response = await api.get<Product>(`/products/slug/${slug}`);
+        const response = await api.get<Product>(`/products/${slug}`);
         return response.data;
     },
 
