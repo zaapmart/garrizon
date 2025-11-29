@@ -6,10 +6,10 @@ spring:
     active: dev
   
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/mydb}
-    username: ${DATABASE_USERNAME:myuser}
-    password: ${DATABASE_PASSWORD:mypassword}
-    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/mydb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   
   jpa:
     hibernate:
@@ -17,7 +17,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
   
   servlet:

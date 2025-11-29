@@ -88,14 +88,25 @@ export const ProductList = () => {
                                 All Products
                             </button>
                             {categories.map((category) => (
-                                <button
-                                    key={category.id}
-                                    onClick={() => handleCategoryChange(category.id)}
-                                    className={`block w-full text-left px-2 py-1 rounded text-sm ${categoryId === category.id ? 'bg-primary/10 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
-                                        }`}
-                                >
-                                    {category.name}
-                                </button>
+                                <React.Fragment key={category.id}>
+                                    <button
+                                        onClick={() => handleCategoryChange(category.id)}
+                                        className={`block w-full text-left px-2 py-1 rounded text-sm ${categoryId === category.id ? 'bg-primary/10 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        {category.name}
+                                    </button>
+                                    {category.subcategories?.map((sub) => (
+                                        <button
+                                            key={sub.id}
+                                            onClick={() => handleCategoryChange(sub.id)}
+                                            className={`block w-full text-left pl-6 pr-2 py-1 rounded text-sm ${categoryId === sub.id ? 'bg-primary/10 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
+                                                }`}
+                                        >
+                                            ↳ {sub.name}
+                                        </button>
+                                    ))}
+                                </React.Fragment>
                             ))}
                         </div>
                     </div>

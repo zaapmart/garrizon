@@ -20,15 +20,20 @@ public class CloudinaryService {
         return (String) uploadResult.get("secure_url");
     }
 
+    public String uploadImageFromUrl(String url) throws IOException {
+        Map uploadResult = cloudinary.uploader().upload(url, ObjectUtils.emptyMap());
+        return (String) uploadResult.get("secure_url");
+    }
+
     public void deleteImage(String imageUrl) throws IOException {
         // Extract public ID from URL
         // Example: https://res.cloudinary.com/demo/image/upload/v1234567890/sample.jpg
         // Public ID: sample
-        
+
         if (imageUrl == null || imageUrl.isEmpty()) {
             return;
         }
-        
+
         String publicId = imageUrl.substring(imageUrl.lastIndexOf("/") + 1, imageUrl.lastIndexOf("."));
         cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
     }

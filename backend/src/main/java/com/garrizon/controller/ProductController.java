@@ -31,8 +31,7 @@ public class ProductController {
     public ResponseEntity<Page<ProductDTO>> getAllProducts(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Long categoryId,
-            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
+            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(productService.getAllProducts(search, categoryId, pageable));
     }
 
@@ -40,6 +39,14 @@ public class ProductController {
     @Operation(summary = "Get product by slug")
     public ResponseEntity<ProductDTO> getProductBySlug(@PathVariable String slug) {
         return ResponseEntity.ok(productService.getProductBySlug(slug));
+    }
+
+    @GetMapping("/admin/products")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get all products for admin (including inactive)")
+    public ResponseEntity<Page<ProductDTO>> getAllProductsForAdmin(
+            @PageableDefault(size = 100, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(productService.getAllProductsForAdmin(pageable));
     }
 
     @PostMapping("/admin/products")
@@ -54,8 +61,7 @@ public class ProductController {
     @Operation(summary = "Update product (Admin only)")
     public ResponseEntity<ProductDTO> updateProduct(
             @PathVariable Long id,
-            @RequestBody ProductDTO productDTO
-    ) {
+            @RequestBody ProductDTO productDTO) {
         return ResponseEntity.ok(productService.updateProduct(id, productDTO));
     }
 
@@ -72,8 +78,16 @@ public class ProductController {
     @Operation(summary = "Upload product image (Admin only)")
     public ResponseEntity<String> uploadProductImage(
             @PathVariable Long id,
-            @Parameter(description = "Image file") @RequestParam("file") MultipartFile file
-    ) throws IOException {
+            @Parameter(description = "Image file") @RequestParam("file") MultipartFile file) throws IOException {
         return ResponseEntity.ok(productService.uploadProductImage(id, file));
+    }
+
+    @PostMapping("/admin/products/{id}/upload-image-url")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Upload product image from URL (Admin only)")
+    public ResponseEntity<String> uploadProductImageFromUrl(
+            @PathVariable Long id,
+            @RequestParam String url) throws IOException {
+        return ResponseEntity.ok(productService.uploadProductImageFromUrl(id, url));
     }
 }

@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
@@ -41,6 +45,11 @@ public class ProductService {
         Product product = productRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return mapToDTO(product);
+    }
+
+    public Page<ProductDTO> getAllProductsForAdmin(@org.springframework.lang.NonNull Pageable pageable) {
+        Page<Product> products = productRepository.findAll(pageable);
+        return products.map(this::mapToDTO);
     }
 
     public ProductDTO createProduct(ProductDTO productDTO) {
@@ -110,10 +119,47 @@ public class ProductService {
         try {
             imageUrl = cloudinaryService.uploadImage(file);
         } catch (Exception e) {
-            // Cloudinary not configured, use placeholder image
-            imageUrl = "https://picsum.photos/seed/" + product.getSlug() + "/400/300";
+            // Cloudinary not configured, try local upload
+            try {
+                String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+                Path uploadPath = Paths.get("uploads");
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                Files.copy(file.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+
+                // Return URL accessible via the static resource handler
+                // Note: This assumes the backend is accessible at the same host as the API
+                // For Docker, we might need a relative path or full URL.
+                // Since the frontend uses the URL directly, we'll try a relative path which
+                // might work if the frontend proxies or we use full URL.
+                // Let's use a relative path starting with /uploads/ which the browser will
+                // resolve against the current origin?
+                // No, the frontend is on port 5173, backend on 8080.
+                // If we return "/uploads/...", the browser will try
+                // "http://localhost:5173/uploads/..." which is wrong.
+                // We need "http://localhost:8080/uploads/...".
+                // Ideally we should have a base URL config, but for now hardcoding
+                // localhost:8080 is the quickest fix for dev.
+                imageUrl = "http://localhost:8080/uploads/" + fileName;
+
+            } catch (IOException ex) {
+                // Fallback to placeholder if local upload also fails
+                imageUrl = "https://picsum.photos/seed/" + product.getSlug() + "/400/300";
+            }
         }
 
+        product.setImageUrl(imageUrl);
+        productRepository.save(product);
+
+        return imageUrl;
+    }
+
+    public String uploadProductImageFromUrl(Long id, String url) throws IOException {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        String imageUrl = cloudinaryService.uploadImageFromUrl(url);
         product.setImageUrl(imageUrl);
         productRepository.save(product);
 

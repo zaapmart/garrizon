@@ -16,6 +16,11 @@ export interface Category {
     name: string;
     slug: string;
     description?: string;
+    imageUrl?: string;
+    parentId?: number;
+    parentName?: string;
+    subcategories?: Category[];
+    isActive?: boolean;
 }
 
 export interface User {

@@ -2,9 +2,9 @@ import api from './api';
 import type { Product, PaginatedResponse } from '../types';
 
 export const productService = {
-    getAllProducts: async (page = 0, size = 10, sortBy = 'id', sortDir = 'asc') => {
+    getAllProducts: async (page = 0, size = 10, sort = 'createdAt,desc') => {
         const response = await api.get<PaginatedResponse<Product>>('/products', {
-            params: { page, size, sortBy, sortDir },
+            params: { page, size, sort },
         });
         return response.data;
     },
@@ -25,8 +25,8 @@ export const productService = {
     },
 
     getProductsByCategory: async (categoryId: number, page = 0, size = 10) => {
-        const response = await api.get<PaginatedResponse<Product>>(`/products/category/${categoryId}`, {
-            params: { page, size }
+        const response = await api.get<PaginatedResponse<Product>>('/products', {
+            params: { categoryId, page, size }
         });
         return response.data;
     }

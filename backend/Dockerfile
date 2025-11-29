@@ -1,5 +1,5 @@
 # Multi-stage build for Spring Boot
-FROM maven:3.9-eclipse-temurin-21-alpine AS build
+FROM maven:3.9-eclipse-temurin-11-alpine AS build
 
 WORKDIR /app
 
@@ -12,15 +12,15 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:11-jre-alpine
 
 WORKDIR /app
 
-# Copy JAR from build stage
-COPY --from=build /app/target/*.jar app.jar
+# Copy WAR from build stage
+COPY --from=build /app/target/*.war app.war
 
 # Expose port
 EXPOSE 8080
 
 # Run application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.war"]

@@ -1,6 +1,6 @@
 package com.garrizon.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,6 +42,7 @@ public class Product {
     @Column(nullable = false)
     private Integer stock = 0;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean isActive = true;
 

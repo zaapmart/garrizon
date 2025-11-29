@@ -43,5 +43,29 @@ export const adminService = {
             },
         });
         return response.data;
+    },
+
+    uploadProductImageFromUrl: async (productId: number, imageUrl: string) => {
+        const response = await api.post<string>(`/admin/products/${productId}/upload-image-url`, null, {
+            params: { url: imageUrl }
+        });
+        return response.data;
+    },
+
+
+    deleteProduct: async (productId: number) => {
+        await api.delete(`/admin/products/${productId}`);
+    },
+
+    getAllProductsForAdmin: async (page = 0, size = 100) => {
+        const response = await api.get<{ content: Product[] }>('/admin/products', {
+            params: { page, size }
+        });
+        return response.data;
+    },
+
+    updateProduct: async (productId: number, productData: Partial<Product>) => {
+        const response = await api.put<Product>(`/admin/products/${productId}`, productData);
+        return response.data;
     }
 };
