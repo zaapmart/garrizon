@@ -1,0 +1,6 @@
+﻿drwxr-xr-x    3 royalsee   royalsee           51 Dec  6 16:12 .
+drwxr-xr-x    3 royalsee   royalsee           51 Dec  6 16:12 ..
+-rw-------    1 royalsee   royalsee           14 Jan  6 00:55 .ftpquota
+drwx------    5 royalsee   royalsee           48 Dec  6 16:12 ROOT
+-rw-r--r--    1 royalsee   royalsee     69568988 Nov 29 08:14 ROOT.war
+

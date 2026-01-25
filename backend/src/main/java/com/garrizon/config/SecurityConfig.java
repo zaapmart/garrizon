@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/health").permitAll()
                 .antMatchers("/api/products", "/api/products/**").permitAll()
                 .antMatchers("/api/categories", "/api/categories/**").permitAll()
                 .antMatchers("/uploads/**").permitAll()
@@ -71,7 +72,9 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "http://localhost:3000",
-                "https://garrizon.vercel.app"));
+                "https://garrizon.vercel.app",
+                "https://garrizon.com",
+                "https://www.garrizon.com"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

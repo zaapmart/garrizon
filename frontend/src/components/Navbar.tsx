@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, User, LogOut, Menu, X } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
-import { cn } from '../lib/utils';
+
 
 export const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuthStore();

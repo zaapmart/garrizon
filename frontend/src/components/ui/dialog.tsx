@@ -52,7 +52,7 @@ export const DialogDescription: React.FC<{ children: React.ReactNode }> = ({ chi
 
 export const DialogClose: React.FC<{ asChild?: boolean; children: React.ReactNode }> = ({ asChild = false, children }) => {
     if (asChild) {
-        return React.cloneElement(React.Children.only(children) as React.ReactElement, {
+        return React.cloneElement(React.Children.only(children) as React.ReactElement<any>, {
             onClick: (e: any) => {
                 const dialog = (e.target as HTMLElement).closest('dialog');
                 if (dialog) dialog.close();

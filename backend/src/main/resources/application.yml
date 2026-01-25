@@ -1,25 +1,22 @@
 spring:
   application:
     name: garrizon-backend
-  
+
   profiles:
     active: dev
-  
+
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/mydb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:root}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  
+    jndi-name: java:comp/env/jdbc/royalsee_garrizon
+
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
-  
+
   servlet:
     multipart:
       max-file-size: 10MB
@@ -33,8 +30,8 @@ server:
 # JWT Configuration
 jwt:
   secret: ${JWT_SECRET:garrizon-super-secret-key-change-this-in-production-minimum-256-bits}
-  access-token-expiration: 900000      # 15 minutes in milliseconds
-  refresh-token-expiration: 604800000  # 7 days in milliseconds
+  access-token-expiration: 900000 # 15 minutes in milliseconds
+  refresh-token-expiration: 604800000 # 7 days in milliseconds
 
 # Cloudinary Configuration
 cloudinary:
@@ -88,5 +85,5 @@ logging:
 scheduler:
   abandoned-cart:
     enabled: true
-    cron: "0 0 */2 * * *"  # Every 2 hours
+    cron: "0 0 */2 * * *" # Every 2 hours
     inactivity-threshold-hours: 1

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Package, ShoppingCart, Users, DollarSign, Plus, Upload, Trash2, Edit } from 'lucide-react';
+import { Package, ShoppingCart, Users, DollarSign, Plus, Upload, Trash2 } from 'lucide-react';
 import { adminService } from '../services/adminService';
 import { categoryService } from '../services/categoryService';
 import type { DashboardMetrics, UserDTO } from '../services/adminService';

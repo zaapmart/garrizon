@@ -1,0 +1,17 @@
+# WinSCP Session Configuration
+# Copy these settings to WinSCP or save as a session
+
+Host name: ftp.royalseeds.net
+Port number: 21
+User name: kufre@app.garrizon.com
+Password: Ilove3lia1986
+Protocol: FTP
+Encryption: None (or TLS/SSL if available)
+Transfer mode: Passive
+
+# To use this in WinSCP:
+# 1. Open WinSCP
+# 2. Click "New Session"
+# 3. Enter the above details
+# 4. Click "Save" to save the session for future use
+# 5. Click "Login" to connect

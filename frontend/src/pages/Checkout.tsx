@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
@@ -17,7 +17,7 @@ interface CheckoutForm {
 }
 
 export const Checkout = () => {
-    const { items, totalAmount, clearCart } = useCartStore();
+    const { items, totalAmount } = useCartStore();
     const navigate = useNavigate();
     const [isProcessing, setIsProcessing] = useState(false);
 
