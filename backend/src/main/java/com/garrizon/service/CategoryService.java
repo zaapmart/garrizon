@@ -42,7 +42,8 @@ public class CategoryService {
                 .slug(categoryDTO.getSlug())
                 .description(categoryDTO.getDescription())
                 .imageUrl(categoryDTO.getImageUrl())
-                .isActive(categoryDTO.getIsActive() != null ? categoryDTO.getIsActive() : true);
+                .isActive(categoryDTO.getIsActive() != null ? categoryDTO.getIsActive() : true)
+                .approvedBy(1L); // Set default admin ID
 
         if (categoryDTO.getParentId() != null) {
             Category parent = categoryRepository.findById(categoryDTO.getParentId())

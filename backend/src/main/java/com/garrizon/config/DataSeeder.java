@@ -30,10 +30,16 @@ public class DataSeeder implements CommandLineRunner {
         private final UserRepository userRepository;
 
         @Override
-        public void run(String... args) throws Exception {
-                seedCategories();
-                seedProducts();
-                seedUsers();
+        public void run(String... args) {
+                try {
+                        seedUsers();
+                        seedCategories();
+                        seedProducts();
+                } catch (Exception e) {
+                        // Log warning but do NOT crash the application
+                        System.err.println("⚠️ DataSeeder warning: " + e.getMessage());
+                        e.printStackTrace();
+                }
         }
 
         private void seedCategories() {
@@ -197,6 +203,12 @@ public class DataSeeder implements CommandLineRunner {
                                         .email("admin@garrizon.com")
                                         .password(new BCryptPasswordEncoder().encode("admin123"))
                                         .role(Role.ADMIN)
+                                        .userRole("ROLE_ADMIN")
+                                        .city("Lagos")
+                                        .country("Nigeria")
+                                        .state("Lagos")
+                                        .phone("0000000000")
+                                        .altPhone("0000000000")
                                         .build();
                         userRepository.save(admin);
                 }

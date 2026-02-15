@@ -42,8 +42,9 @@ public class SecurityConfig {
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
                 .authorizeRequests()
+                .antMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/api/health").permitAll()
+                .antMatchers("/health").permitAll()
                 .antMatchers("/api/products", "/api/products/**").permitAll()
                 .antMatchers("/api/categories", "/api/categories/**").permitAll()
                 .antMatchers("/uploads/**").permitAll()
@@ -69,12 +70,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",
-                "http://localhost:3000",
-                "https://garrizon.vercel.app",
-                "https://garrizon.com",
-                "https://www.garrizon.com"));
+        configuration.setAllowedOriginPatterns(List.of("*")); // Allow all origins for debugging
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

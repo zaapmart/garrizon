@@ -1,0 +1,21 @@
+Inspecting 'users' table columns...
+Column: id, Type: INT, Nullable: 0
+Column: address, Type: VARCHAR, Nullable: 1
+Column: alt_phone_no, Type: VARCHAR, Nullable: 1
+Column: city, Type: LONGTEXT, Nullable: 0
+Column: country, Type: LONGTEXT, Nullable: 0
+Column: date_created, Type: DATETIME, Nullable: 0
+Column: email, Type: LONGTEXT, Nullable: 0
+Column: first_name, Type: LONGTEXT, Nullable: 0
+Column: last_name, Type: LONGTEXT, Nullable: 0
+Column: password, Type: VARCHAR, Nullable: 0
+Column: phone_no, Type: VARCHAR, Nullable: 1
+Column: profile_pic, Type: VARCHAR, Nullable: 1
+Column: state, Type: LONGTEXT, Nullable: 0
+Column: user_role, Type: VARCHAR, Nullable: 0
+Column: created_at, Type: DATETIME, Nullable: 1
+Column: updated_at, Type: DATETIME, Nullable: 1
+Column: deleted_at, Type: DATETIME, Nullable: 1
+Column: phone, Type: LONGTEXT, Nullable: 0
+Column: alt_phone, Type: LONGTEXT, Nullable: 0
+Column: role, Type: VARCHAR, Nullable: 0

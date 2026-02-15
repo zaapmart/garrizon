@@ -1,21 +1,20 @@
 package com.garrizon.service;
 
 import com.garrizon.dto.OrderDTO;
-import com.garrizon.dto.OrderItemDTO;
-import com.garrizon.exception.BadRequestException;
 import com.garrizon.exception.ResourceNotFoundException;
-import com.garrizon.model.*;
-import com.garrizon.repository.CartRepository;
+import com.garrizon.model.Order;
+import com.garrizon.model.Order.OrderStatus;
+import com.garrizon.model.Order.PaymentStatus;
+import com.garrizon.model.OrderItem;
 import com.garrizon.repository.OrderRepository;
-import com.garrizon.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,109 +22,152 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final OrderRepository orderRepository;
-    private final CartRepository cartRepository;
-    private final UserRepository userRepository;
+        private final OrderRepository orderRepository;
 
-    @Transactional
-    public OrderDTO createOrder(UserDetails userDetails, String shippingAddress, PaymentProvider paymentProvider) {
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        Cart cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
-
-        if (cart.getCartItems().isEmpty()) {
-            throw new BadRequestException("Cart is empty");
+        @Transactional(readOnly = true)
+        public Page<OrderDTO> getAllOrders(OrderStatus status, PaymentStatus paymentStatus, String search,
+                        Pageable pageable) {
+                Page<Order> orders = orderRepository.findByFilters(status, paymentStatus, search, pageable);
+                return orders.map(this::mapToDTO);
         }
 
-        BigDecimal totalAmount = cart.getCartItems().stream()
-                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        Order order = Order.builder()
-                .user(user)
-                .totalAmount(totalAmount)
-                .status(OrderStatus.PENDING)
-                .paymentProvider(paymentProvider)
-                .paymentStatus(PaymentStatus.PENDING)
-                .shippingAddress(shippingAddress)
-                .customerName(user.getFirstName() + " " + user.getLastName())
-                .customerEmail(user.getEmail())
-                .build();
-
-        for (CartItem cartItem : cart.getCartItems()) {
-            OrderItem orderItem = OrderItem.builder()
-                    .order(order)
-                    .product(cartItem.getProduct())
-                    .quantity(cartItem.getQuantity())
-                    .price(cartItem.getPrice())
-                    .productName(cartItem.getProduct().getName())
-                    .build();
-            order.addItem(orderItem);
+        @Transactional(readOnly = true)
+        public OrderDTO getOrderById(Long id) {
+                Order order = orderRepository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+                return mapToDTO(order);
         }
 
-        Order savedOrder = orderRepository.save(order);
+        @Transactional(readOnly = true)
+        public OrderDTO getOrderByOrderNumber(String orderNumber) {
+                Order order = orderRepository.findByOrderNumber(orderNumber)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Order not found with number: " + orderNumber));
+                return mapToDTO(order);
+        }
 
-        // Clear cart after order creation
-        cart.getCartItems().clear();
-        cartRepository.save(cart);
+        @Transactional(readOnly = true)
+        public List<OrderDTO> getRecentOrders() {
+                List<Order> orders = orderRepository.findTop10ByOrderByCreatedAtDesc();
+                return orders.stream()
+                                .map(this::mapToDTO)
+                                .collect(Collectors.toList());
+        }
 
-        return mapToDTO(savedOrder);
-    }
+        @Transactional
+        public OrderDTO updateOrderStatus(Long id, OrderStatus status) {
+                Order order = orderRepository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
 
-    public Page<OrderDTO> getUserOrders(UserDetails userDetails, Pageable pageable) {
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        
-        return orderRepository.findByUserIdOrderByCreatedAtDesc(user.getId(), pageable)
-                .map(this::mapToDTO);
-    }
+                order.setStatus(status);
 
-    public OrderDTO getOrder(Long id) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-        return mapToDTO(order);
-    }
+                if (status == OrderStatus.COMPLETED) {
+                        order.setCompletedAt(LocalDateTime.now());
+                } else if (status == OrderStatus.CANCELLED) {
+                        order.setCancelledAt(LocalDateTime.now());
+                }
 
-    public Page<OrderDTO> getAllOrders(Pageable pageable) {
-        return orderRepository.findAllByOrderByCreatedAtDesc(pageable)
-                .map(this::mapToDTO);
-    }
+                Order updatedOrder = orderRepository.save(order);
+                return mapToDTO(updatedOrder);
+        }
 
-    public OrderDTO updateOrderStatus(Long id, OrderStatus status) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-        
-        order.setStatus(status);
-        return mapToDTO(orderRepository.save(order));
-    }
+        @Transactional
+        public OrderDTO updatePaymentStatus(Long id, PaymentStatus paymentStatus) {
+                Order order = orderRepository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
 
-    private OrderDTO mapToDTO(Order order) {
-        List<OrderItemDTO> itemDTOs = order.getOrderItems().stream()
-                .map(item -> OrderItemDTO.builder()
-                        .id(item.getId())
-                        .productId(item.getProduct().getId())
-                        .productName(item.getProductName())
-                        .productImageUrl(item.getProduct().getImageUrl())
-                        .quantity(item.getQuantity())
-                        .price(item.getPrice())
-                        .subtotal(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                        .build())
-                .collect(Collectors.toList());
+                order.setPaymentStatus(paymentStatus);
+                Order updatedOrder = orderRepository.save(order);
+                return mapToDTO(updatedOrder);
+        }
 
-        return OrderDTO.builder()
-                .id(order.getId())
-                .orderNumber(order.getOrderNumber())
-                .items(itemDTOs)
-                .totalAmount(order.getTotalAmount())
-                .status(order.getStatus())
-                .paymentProvider(order.getPaymentProvider())
-                .paymentStatus(order.getPaymentStatus())
-                .shippingAddress(order.getShippingAddress())
-                .createdAt(order.getCreatedAt())
-                .customerName(order.getCustomerName())
-                .customerEmail(order.getCustomerEmail())
-                .build();
-    }
+        @Transactional
+        public OrderDTO addAdminNotes(Long id, String notes) {
+                Order order = orderRepository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+
+                order.setAdminNotes(notes);
+                Order updatedOrder = orderRepository.save(order);
+                return mapToDTO(updatedOrder);
+        }
+
+        // Statistics methods
+        @Transactional(readOnly = true)
+        public Long countOrdersToday() {
+                LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+                return orderRepository.countOrdersToday(startOfDay);
+        }
+
+        @Transactional(readOnly = true)
+        public Long countPendingOrders() {
+                return orderRepository.countByStatus(OrderStatus.PENDING);
+        }
+
+        @Transactional(readOnly = true)
+        public BigDecimal getTodayRevenue() {
+                LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+                return orderRepository.sumRevenueToday(startOfDay);
+        }
+
+        @Transactional(readOnly = true)
+        public BigDecimal getTotalRevenue() {
+                return orderRepository.sumTotalRevenue();
+        }
+
+        @Transactional(readOnly = true)
+        public Long getTotalOrders() {
+                return orderRepository.count();
+        }
+
+        // Mapping methods
+        private OrderDTO mapToDTO(Order order) {
+                return OrderDTO.builder()
+                                .id(order.getId())
+                                .orderNumber(order.getOrderNumber())
+                                .userId(order.getUser().getId())
+                                .customerName(order.getShippingName())
+                                .customerEmail(order.getShippingEmail())
+                                .subtotal(order.getSubtotal())
+                                .taxAmount(order.getTaxAmount())
+                                .shippingAmount(order.getShippingAmount())
+                                .discountAmount(order.getDiscountAmount())
+                                .totalAmount(order.getTotalAmount())
+                                .status(order.getStatus().name())
+                                .paymentStatus(order.getPaymentStatus().name())
+                                .shippingName(order.getShippingName())
+                                .shippingEmail(order.getShippingEmail())
+                                .shippingPhone(order.getShippingPhone())
+                                .shippingAddressLine1(order.getShippingAddressLine1())
+                                .shippingAddressLine2(order.getShippingAddressLine2())
+                                .shippingCity(order.getShippingCity())
+                                .shippingState(order.getShippingState())
+                                .shippingPostalCode(order.getShippingPostalCode())
+                                .shippingCountry(order.getShippingCountry())
+                                .paymentMethod(order.getPaymentMethod())
+                                .paymentReference(order.getPaymentReference())
+                                .customerNotes(order.getCustomerNotes())
+                                .adminNotes(order.getAdminNotes())
+                                .items(order.getItems().stream()
+                                                .map(this::mapItemToDTO)
+                                                .collect(Collectors.toList()))
+                                .itemCount(order.getItemCount())
+                                .createdAt(order.getCreatedAt())
+                                .updatedAt(order.getUpdatedAt())
+                                .completedAt(order.getCompletedAt())
+                                .cancelledAt(order.getCancelledAt())
+                                .build();
+        }
+
+        private OrderDTO.OrderItemDTO mapItemToDTO(OrderItem item) {
+                return OrderDTO.OrderItemDTO.builder()
+                                .id(item.getId())
+                                .productId(item.getProduct().getId())
+                                .productName(item.getProductName())
+                                .productSlug(item.getProductSlug())
+                                .productImageUrl(item.getProductImageUrl())
+                                .unitPrice(item.getUnitPrice())
+                                .quantity(item.getQuantity())
+                                .subtotal(item.getSubtotal())
+                                .build();
+        }
 }

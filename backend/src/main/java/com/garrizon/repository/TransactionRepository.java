@@ -1,0 +1,36 @@
+package com.garrizon.repository;
+
+import com.garrizon.model.Transaction;
+import com.garrizon.model.Transaction.TransactionStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+
+    Optional<Transaction> findByReference(String reference);
+
+    Page<Transaction> findByStatus(TransactionStatus status, Pageable pageable);
+
+    @Query("SELECT t FROM Transaction t WHERE " +
+            "(:status IS NULL OR t.status = :status) AND " +
+            "(:search IS NULL OR t.reference LIKE %:search% OR " +
+            "t.customerName LIKE %:search% OR t.customerEmail LIKE %:search%)")
+    Page<Transaction> findByFilters(@Param("status") TransactionStatus status,
+            @Param("search") String search,
+            Pageable pageable);
+
+    @Query("SELECT COUNT(t) FROM Transaction t WHERE t.status = :status")
+    Long countByStatus(@Param("status") TransactionStatus status);
+
+    List<Transaction> findByOrderId(Long orderId);
+
+    List<Transaction> findByUserId(Long userId);
+}

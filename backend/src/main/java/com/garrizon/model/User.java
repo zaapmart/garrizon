@@ -41,16 +41,60 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role = Role.USER;
 
-    @Column(nullable = false, updatable = false)
+    @Builder.Default
+    @Column(name = "user_role")
+    private String userRole = "ROLE_USER";
+
+    @Builder.Default
+    @Column(nullable = false)
+    private String city = "Default City";
+
+    @Builder.Default
+    @Column(nullable = false)
+    private String country = "Nigeria";
+
+    @Builder.Default
+    @Column(nullable = false)
+    private String state = "Default State";
+
+    @Builder.Default
+    @Column(nullable = false)
+    private String phone = "0000000000";
+
+    @Builder.Default
+    @Column(name = "alt_phone", nullable = false)
+    private String altPhone = "0000000000";
+
+    @Column(name = "date_created", nullable = false)
+    private LocalDateTime dateCreated;
+
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+        if (dateCreated == null)
+            dateCreated = LocalDateTime.now();
+        if (createdAt == null)
+            createdAt = LocalDateTime.now();
+        if (updatedAt == null)
+            updatedAt = LocalDateTime.now();
+
+        // Defensive defaults for legacy/strict DB constraints
+        if (city == null)
+            city = "Default City";
+        if (country == null)
+            country = "Nigeria";
+        if (state == null)
+            state = "Default State";
+        if (phone == null)
+            phone = "0000000000";
+        if (altPhone == null)
+            altPhone = "0000000000";
+        if (userRole == null)
+            userRole = "ROLE_USER";
     }
 
     @PreUpdate

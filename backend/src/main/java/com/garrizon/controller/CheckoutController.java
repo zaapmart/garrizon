@@ -33,16 +33,17 @@ public class CheckoutController {
 
     @PostMapping("/stripe/create-payment-intent")
     @Operation(summary = "Create Stripe PaymentIntent")
-    public ResponseEntity<Map<String, String>> createStripePaymentIntent(@RequestBody Map<String, Object> request) throws StripeException {
+    public ResponseEntity<Map<String, String>> createStripePaymentIntent(@RequestBody Map<String, Object> request)
+            throws StripeException {
         Long orderId = Long.parseLong(request.get("orderId").toString());
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BadRequestException("Order not found"));
 
         PaymentIntent paymentIntent = stripeService.createPaymentIntent(order.getTotalAmount(), "usd");
-        
+
         Map<String, String> response = new HashMap<>();
         response.put("clientSecret", paymentIntent.getClientSecret());
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -53,7 +54,8 @@ public class CheckoutController {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BadRequestException("Order not found"));
 
-        return ResponseEntity.ok(paystackService.initializeTransaction(order.getCustomerEmail(), order.getTotalAmount()));
+        return ResponseEntity
+                .ok(paystackService.initializeTransaction(order.getCustomerEmail(), order.getTotalAmount()));
     }
 
     @PostMapping("/verify-payment")

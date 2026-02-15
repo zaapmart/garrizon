@@ -29,8 +29,7 @@ public class CartController {
     @Operation(summary = "Add item to cart")
     public ResponseEntity<CartDTO> addToCart(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody AddToCartRequest request
-    ) {
+            @RequestBody AddToCartRequest request) {
         return ResponseEntity.ok(cartService.addToCart(userDetails, request));
     }
 
@@ -39,8 +38,7 @@ public class CartController {
     public ResponseEntity<CartDTO> updateCartItemQuantity(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long itemId,
-            @RequestParam Integer quantity
-    ) {
+            @RequestParam Integer quantity) {
         return ResponseEntity.ok(cartService.updateCartItemQuantity(userDetails, itemId, quantity));
     }
 
@@ -48,8 +46,7 @@ public class CartController {
     @Operation(summary = "Remove item from cart")
     public ResponseEntity<CartDTO> removeCartItem(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long itemId
-    ) {
+            @PathVariable Long itemId) {
         return ResponseEntity.ok(cartService.removeCartItem(userDetails, itemId));
     }
 

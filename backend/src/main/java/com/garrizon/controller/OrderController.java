@@ -30,8 +30,7 @@ public class OrderController {
     public ResponseEntity<OrderDTO> createOrder(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam String shippingAddress,
-            @RequestParam PaymentProvider paymentProvider
-    ) {
+            @RequestParam PaymentProvider paymentProvider) {
         return ResponseEntity.ok(orderService.createOrder(userDetails, shippingAddress, paymentProvider));
     }
 
@@ -39,8 +38,7 @@ public class OrderController {
     @Operation(summary = "Get user's orders")
     public ResponseEntity<Page<OrderDTO>> getUserOrders(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(orderService.getUserOrders(userDetails, pageable));
     }
 
@@ -54,8 +52,7 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all orders (Admin only)")
     public ResponseEntity<Page<OrderDTO>> getAllOrders(
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(orderService.getAllOrders(pageable));
     }
 
@@ -64,8 +61,7 @@ public class OrderController {
     @Operation(summary = "Update order status (Admin only)")
     public ResponseEntity<OrderDTO> updateOrderStatus(
             @PathVariable Long id,
-            @RequestParam OrderStatus status
-    ) {
+            @RequestParam OrderStatus status) {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
     }
 }

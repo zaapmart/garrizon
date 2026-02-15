@@ -33,6 +33,10 @@ public class Category {
 
     private String imageUrl;
 
+    @Column(name = "approved_by", nullable = false)
+    @Builder.Default
+    private Long approvedBy = 1L;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Category parent;

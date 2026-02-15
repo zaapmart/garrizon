@@ -35,6 +35,10 @@ public class Product {
 
     private String imageUrl;
 
+    @Column(name = "approved_by", nullable = false)
+    @Builder.Default
+    private Long approvedBy = 1L;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
