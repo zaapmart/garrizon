@@ -7,6 +7,11 @@ import com.garrizon.model.Transaction.TransactionStatus;
 import com.garrizon.repository.UserRepository;
 import com.garrizon.security.JwtTokenProvider;
 import com.garrizon.service.*;
+import com.garrizon.model.User;
+import com.garrizon.model.Role;
+import com.garrizon.exception.ResourceNotFoundException;
+import com.garrizon.exception.BadRequestException;
+import org.springframework.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -206,8 +211,22 @@ public class AdminController {
 
     // ==================== Helper Methods ====================
 
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
     private Long getUserIdFromToken(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveToken(request);
-        return jwtTokenProvider.getUserIdFromToken(token);
+        String token = resolveToken(request);
+        if (token != null) {
+            String email = jwtTokenProvider.extractUsername(token);
+            return userRepository.findByEmail(email)
+                    .map(User::getId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        }
+        throw new BadRequestException("Invalid token");
     }
 }

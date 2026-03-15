@@ -1,0 +1,18 @@
+HTTP/1.1 200 200
+Date: Sun, 15 Mar 2026 15:20:27 GMT
+Server: Apache
+Vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+Access-Control-Allow-Origin: https://garrizon.com
+Access-Control-Allow-Methods: GET,POST,PUT,OPTIONS,DELETE,PATCH
+Access-Control-Expose-Headers: Authorization, Link, X-Total-Count
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 3600
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+X-Frame-Options: DENY
+Transfer-Encoding: chunked
+

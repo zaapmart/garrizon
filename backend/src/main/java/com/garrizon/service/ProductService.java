@@ -67,6 +67,7 @@ public class ProductService {
                 .slug(slug)
                 .description(productDTO.getDescription())
                 .price(productDTO.getPrice())
+                .costPrice(productDTO.getCostPrice())
                 .imageUrl(productDTO.getImageUrl())
                 .category(category)
                 .stock(productDTO.getStock())
@@ -93,6 +94,8 @@ public class ProductService {
             product.setDescription(productDTO.getDescription());
         if (productDTO.getPrice() != null)
             product.setPrice(productDTO.getPrice());
+        if (productDTO.getCostPrice() != null)
+            product.setCostPrice(productDTO.getCostPrice());
         if (productDTO.getImageUrl() != null)
             product.setImageUrl(productDTO.getImageUrl());
         if (productDTO.getStock() != null)
@@ -173,9 +176,10 @@ public class ProductService {
                 .slug(product.getSlug())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .costPrice(product.getCostPrice())
                 .imageUrl(product.getImageUrl())
-                .categoryId(product.getCategory().getId())
-                .categoryName(product.getCategory().getName())
+                .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
+                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
                 .stock(product.getStock())
                 .isActive(product.getIsActive())
                 .build();

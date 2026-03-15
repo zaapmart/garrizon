@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 4. CREATE BANNERS TABLE
+-- 4. CREATE BANNERS TABLE (without foreign key to avoid type mismatch)
 CREATE TABLE IF NOT EXISTS banners (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -109,12 +109,13 @@ CREATE TABLE IF NOT EXISTS banners (
     created_by BIGINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_banners_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_is_active (is_active),
     INDEX idx_display_order (display_order),
     INDEX idx_start_date (start_date),
-    INDEX idx_end_date (end_date)
+    INDEX idx_end_date (end_date),
+    INDEX idx_created_by (created_by)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- 5. ADD INVENTORY TRACKING TO PRODUCTS (Run only if columns don't exist)
 -- If you get errors about duplicate columns, skip this section

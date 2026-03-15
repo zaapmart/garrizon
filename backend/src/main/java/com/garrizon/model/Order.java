@@ -150,6 +150,23 @@ public class Order {
                 .sum();
     }
 
+    // Compatibility methods
+    public String getCustomerEmail() {
+        return shippingEmail;
+    }
+
+    public String getCustomerName() {
+        return shippingName;
+    }
+
+    public void setPaymentIntentId(String paymentIntentId) {
+        this.paymentReference = paymentIntentId;
+    }
+
+    public String getPaymentIntentId() {
+        return paymentReference;
+    }
+
     // Enums
     public enum OrderStatus {
         PENDING,

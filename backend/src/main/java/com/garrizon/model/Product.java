@@ -33,6 +33,10 @@ public class Product {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
+    @Column(name = "cost_price", nullable = true, precision = 10, scale = 2) // Changed to nullable: true to avoid
+                                                                             // crashes if frontend omits it initially
+    private BigDecimal costPrice;
+
     private String imageUrl;
 
     @Column(name = "approved_by", nullable = false)

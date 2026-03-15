@@ -3,7 +3,6 @@ package com.garrizon.controller;
 import com.garrizon.dto.OrderDTO;
 import com.garrizon.exception.BadRequestException;
 import com.garrizon.model.Order;
-import com.garrizon.model.PaymentStatus;
 import com.garrizon.repository.OrderRepository;
 import com.garrizon.service.OrderService;
 import com.garrizon.service.PaystackService;
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,64 +26,70 @@ public class CheckoutController {
 
     private final StripeService stripeService;
     private final PaystackService paystackService;
-    private final OrderRepository orderRepository;
     private final OrderService orderService;
+    private final OrderRepository orderRepository;
 
     @PostMapping("/stripe/create-payment-intent")
-    @Operation(summary = "Create Stripe PaymentIntent")
-    public ResponseEntity<Map<String, String>> createStripePaymentIntent(@RequestBody Map<String, Object> request)
-            throws StripeException {
-        Long orderId = Long.parseLong(request.get("orderId").toString());
+    @Operation(summary = "Create Stripe payment intent")
+    public ResponseEntity<Map<String, String>> createStripePaymentIntent(
+            @RequestParam Long orderId) throws StripeException {
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BadRequestException("Order not found"));
 
-        PaymentIntent paymentIntent = stripeService.createPaymentIntent(order.getTotalAmount(), "usd");
+        PaymentIntent paymentIntent = stripeService.createPaymentIntent(
+                order.getTotalAmount(),
+                "NGN");
 
         Map<String, String> response = new HashMap<>();
         response.put("clientSecret", paymentIntent.getClientSecret());
+        response.put("paymentIntentId", paymentIntent.getId());
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/paystack/initialize")
-    @Operation(summary = "Initialize Paystack transaction")
-    public ResponseEntity<Map<String, Object>> initializePaystackTransaction(@RequestBody Map<String, Object> request) {
-        Long orderId = Long.parseLong(request.get("orderId").toString());
+    @Operation(summary = "Initialize Paystack payment")
+    public ResponseEntity<Map<String, Object>> initializePaystackPayment(
+            @RequestParam Long orderId,
+            @RequestParam String email) {
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BadRequestException("Order not found"));
 
-        return ResponseEntity
-                .ok(paystackService.initializeTransaction(order.getCustomerEmail(), order.getTotalAmount()));
+        Map<String, Object> paystackResponse = paystackService.initializeTransaction(
+                email,
+                order.getTotalAmount());
+
+        return ResponseEntity.ok(paystackResponse);
     }
 
-    @PostMapping("/verify-payment")
-    @Operation(summary = "Verify payment status (Stripe or Paystack)")
-    public ResponseEntity<OrderDTO> verifyPayment(@RequestBody Map<String, String> request) throws StripeException {
-        Long orderId = Long.parseLong(request.get("orderId"));
-        String provider = request.get("provider");
-        String reference = request.get("reference"); // PaymentIntentId for Stripe, Reference for Paystack
+    @GetMapping("/verify-payment/{orderId}")
+    @Operation(summary = "Verify payment status")
+    public ResponseEntity<OrderDTO> verifyPayment(
+            @PathVariable Long orderId,
+            @RequestParam String reference,
+            @RequestParam(required = false) String provider) throws StripeException {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BadRequestException("Order not found"));
 
         boolean isSuccess = false;
 
-        if ("STRIPE".equalsIgnoreCase(provider)) {
-            PaymentIntent intent = stripeService.retrievePaymentIntent(reference);
-            if ("succeeded".equals(intent.getStatus())) {
-                isSuccess = true;
-            }
-        } else if ("PAYSTACK".equalsIgnoreCase(provider)) {
+        if ("paystack".equalsIgnoreCase(provider)) {
             isSuccess = paystackService.verifyTransaction(reference);
+        } else {
+            // Assume Stripe - verify by retrieving the payment intent
+            PaymentIntent intent = stripeService.retrievePaymentIntent(reference);
+            isSuccess = "succeeded".equals(intent.getStatus());
         }
 
         if (isSuccess) {
-            order.setPaymentStatus(PaymentStatus.COMPLETED);
-            order.setPaymentIntentId(reference);
+            order.setPaymentStatus(Order.PaymentStatus.PAID);
             orderRepository.save(order);
             // TODO: Trigger email confirmation here
         }
 
-        return ResponseEntity.ok(orderService.getOrder(orderId));
+        return ResponseEntity.ok(orderService.getOrderById(orderId));
     }
 }

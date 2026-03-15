@@ -4,6 +4,7 @@ export interface Product {
     slug: string;
     description: string;
     price: number;
+    costPrice?: number;
     imageUrl: string;
     categoryId: number;
     categoryName: string;
